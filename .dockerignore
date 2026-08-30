@@ -1,0 +1,29 @@
+# Git
+.git
+.gitignore
+
+# Environments and caches
+.venv
+venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.ruff_cache
+
+# MLflow local runs
+mlruns/
+mlartifacts/
+
+# Notebook checkpoints
+.ipynb_checkpoints
+notebooks/
+
+# Documentation and PDF files
+*.pdf
+*.md
+!README.md
+
+# Env local files
+.env
