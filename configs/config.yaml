@@ -1,0 +1,36 @@
+project:
+  name: online_shoppers_intention
+  seed: 42
+
+data:
+  raw_path: "data/raw/online_shoppers_intention.csv"
+  processed_dir: "data/processed"
+  target_column: "Revenue"
+  test_size: 0.2
+  stratify: true
+
+features:
+  numerical_features:
+    - Administrative
+    - Administrative_Duration
+    - Informational
+    - Informational_Duration
+    - ProductRelated
+    - ProductRelated_Duration
+    - BounceRates
+    - ExitRates
+    - PageValues
+    - SpecialDay
+  categorical_features:
+    - Month
+    - OperatingSystems
+    - Browser
+    - Region
+    - TrafficType
+    - VisitorType
+  boolean_features:
+    - Weekend
+
+mlflow:
+  experiment_name: "online-shopper-purchase-intention"
+  registered_model_name: "online_shopper_intention_model"
