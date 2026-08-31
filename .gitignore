@@ -57,3 +57,7 @@ mlartifacts/
 .coverage
 htmlcov/
 .ruff_cache/
+
+# Local scripts and draft notes
+roteiro_video_star.md
+docs/roteiro_*.md
