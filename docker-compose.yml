@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # Servidor Centralizado do MLflow (Tracking & Model Registry)
+  # ----------------------------------------------------------------------------
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.11.0
+    container_name: fiap_mlflow_server
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlflow/mlruns
+      - ./mlartifacts:/mlflow/mlartifacts
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri sqlite:////mlflow/mlruns/mlflow.db
+      --default-artifact-root /mlflow/mlartifacts
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # Pipeline de Engenharia de Machine Learning (DVC Reproduzível)
+  # ----------------------------------------------------------------------------
+  pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fiap_mle_pipeline
+    depends_on:
+      - mlflow
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./eval_plots:/app/eval_plots
+      - ./metrics.json:/app/metrics.json
+    command: ["dvc", "repro"]

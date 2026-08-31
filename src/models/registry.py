@@ -2,6 +2,7 @@
 
 import mlflow
 from mlflow.tracking import MlflowClient
+from src.config import AppConfig
 from src.utils.logger import setup_logger
 
 logger = setup_logger("model_registry")
@@ -22,6 +23,9 @@ def register_best_model(
     Returns:
         URI do modelo registrado.
     """
+    config = AppConfig()
+    mlflow.set_tracking_uri(config.tracking_uri)
+
     client = MlflowClient()
     experiment = client.get_experiment_by_name(experiment_name)
     if experiment is None:
@@ -53,3 +57,10 @@ def register_best_model(
         f"Modelo registrado com sucesso: {registered_model_name} (Versão: {model_version.version})"
     )
     return model_uri
+
+
+if __name__ == "__main__":
+    app_config = AppConfig()
+    exp_name = app_config.config["mlflow"]["experiment_name"]
+    model_name = app_config.config["mlflow"]["registered_model_name"]
+    register_best_model(experiment_name=exp_name, registered_model_name=model_name)
