@@ -6,8 +6,8 @@ from typing import Any, Dict
 import yaml
 from dotenv import load_dotenv
 
-# Carrega variáveis de ambiente do .env
-load_dotenv()
+# Carrega variáveis de ambiente do .env sem sobrescrever variáveis do sistema/Docker
+load_dotenv(override=False)
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 CONFIG_PATH = ROOT_DIR / "configs" / "config.yaml"

@@ -39,17 +39,24 @@ FROM python:3.12-slim AS runtime
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH="/app" \
     PATH="/app/.venv/bin:$PATH"
 
 WORKDIR /app
 
-# Instala Git (essencial para o DVC e controle de versão de metadados)
+# Instala Git (essencial para o DVC)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     && rm -rf /var/lib/apt/lists/*
 
 # Copia o ambiente virtual criado no estágio builder
 COPY --from=builder /app/.venv /app/.venv
+
+# Configura o Git e inicializa o repositório no container para o DVC
+RUN git config --global --add safe.directory /app \
+    && git config --global user.email "mle@fiap.com" \
+    && git config --global user.name "FIAP MLE" \
+    && git init
 
 # Copia o código-fonte, configurações e arquivos do projeto
 COPY configs/ ./configs/

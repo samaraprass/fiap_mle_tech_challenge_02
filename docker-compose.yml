@@ -10,14 +10,14 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./mlruns:/mlflow/mlruns
-      - ./mlartifacts:/mlflow/mlartifacts
+      - ./mlruns:/app/mlruns
+      - ./mlartifacts:/app/mlartifacts
     command: >
       mlflow server
       --host 0.0.0.0
       --port 5000
-      --backend-store-uri sqlite:////mlflow/mlruns/mlflow.db
-      --default-artifact-root /mlflow/mlartifacts
+      --backend-store-uri /app/mlruns
+      --default-artifact-root /app/mlartifacts
     restart: unless-stopped
 
   # ----------------------------------------------------------------------------
@@ -32,10 +32,11 @@ services:
       - mlflow
     environment:
       - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - PYTHONPATH=/app
       - PYTHONUNBUFFERED=1
     volumes:
       - ./data:/app/data
       - ./models:/app/models
       - ./eval_plots:/app/eval_plots
-      - ./metrics.json:/app/metrics.json
-    command: ["dvc", "repro"]
+      - ./mlruns:/app/mlruns
+    command: ["dvc", "repro", "-f"]
