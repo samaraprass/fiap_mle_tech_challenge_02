@@ -7,14 +7,6 @@
 [![MLflow](https://img.shields.io/badge/MLflow-Tracking_%26_Registry-0194E2.svg?logo=mlflow&logoColor=white)](https://mlflow.org/)
 [![Docker](https://img.shields.io/badge/Docker-Multi--stage_Build-2496ED.svg?logo=docker&logoColor=white)](https://www.docker.com/)
 
----
-
-## 🎥 Vídeo de Apresentação (Método STAR - 5 minutos)
-
-> 📺 **Link do Vídeo no YouTube / Loom:** [👉 CLIQUE AQUI PARA ASSISTIR AO VÍDEO](https://youtube.com/) *(Substitua pelo link final da gravação)*
-
----
-
 ## 📌 1. Visão Geral do Projeto
 
 Este projeto foi desenvolvido como entrega oficial da **Fase 2 do curso de Machine Learning Engineering (FIAP / Pós Tech)**.
@@ -210,4 +202,4 @@ Como o dataset possui forte desbalanceamento de classes (**84.53% False vs 15.47
 ---
 
 ## 👥 Autores
-Projeto desenvolvido pelo Grupo de Machine Learning Engineering - FIAP Pós Tech.
+Projeto desenvolvido por Samara Prass dos Santos para a Pós-Tech de Machine Learning Engineering - FIAP.
