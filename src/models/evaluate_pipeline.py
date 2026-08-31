@@ -9,13 +9,14 @@ from sklearn.metrics import precision_recall_curve, roc_curve
 
 from src.config import AppConfig, ROOT_DIR
 from src.models.evaluate import evaluate_classifier
+from src.models.registry import register_best_model
 from src.utils.logger import setup_logger
 
 logger = setup_logger("evaluate_stage")
 
 
 def run_evaluation_pipeline() -> None:
-    """Carrega o modelo salvo e o conjunto de teste para calcular e persistir as métricas."""
+    """Carrega o modelo salvo e o conjunto de teste para calcular métricas e registrar no MLflow."""
     config = AppConfig()
     target_col = config.config["data"]["target_column"]
     test_path = config.processed_dir / "test.csv"
@@ -37,16 +38,22 @@ def run_evaluation_pipeline() -> None:
 
     metrics = evaluate_classifier(y_test.to_numpy(), y_pred, y_prob)
 
+    # Diretório de plots e relatórios
+    plots_dir = ROOT_DIR / "eval_plots"
+    plots_dir.mkdir(parents=True, exist_ok=True)
+
     # Salva metrics.json para o DVC
     metrics_path = ROOT_DIR / "metrics.json"
     with open(metrics_path, "w", encoding="utf-8") as f:
         json.dump(metrics, f, indent=4)
+
+    # Salva cópia na pasta montada eval_plots
+    with open(plots_dir / "metrics.json", "w", encoding="utf-8") as f:
+        json.dump(metrics, f, indent=4)
+
     logger.info(f"Métricas DVC salvas em: {metrics_path}")
 
     # Salva pontos das curvas para DVC plots
-    plots_dir = ROOT_DIR / "eval_plots"
-    plots_dir.mkdir(parents=True, exist_ok=True)
-
     fpr, tpr, _ = roc_curve(y_test, y_prob)
     roc_df = pd.DataFrame({"fpr": fpr, "tpr": tpr})
     roc_df.to_csv(plots_dir / "roc_curve.csv", index=False)
@@ -58,6 +65,7 @@ def run_evaluation_pipeline() -> None:
     # Log de métricas no MLflow
     mlflow.set_tracking_uri(config.tracking_uri)
     experiment_name = config.config["mlflow"]["experiment_name"]
+    model_name = config.config["mlflow"]["registered_model_name"]
     mlflow.set_experiment(experiment_name)
 
     with mlflow.start_run(run_name="dvc_evaluate_run"):
@@ -70,6 +78,12 @@ def run_evaluation_pipeline() -> None:
         f"Avaliação concluída! ROC-AUC: {metrics['roc_auc']:.4f} | "
         f"PR-AUC: {metrics['pr_auc']:.4f} | F1: {metrics['f1_score']:.4f}"
     )
+
+    # Registro automático do melhor modelo no MLflow Model Registry
+    try:
+        register_best_model(experiment_name=experiment_name, registered_model_name=model_name)
+    except Exception as e:
+        logger.warning(f"Não foi possível registrar o modelo no Model Registry: {e}")
 
 
 if __name__ == "__main__":
